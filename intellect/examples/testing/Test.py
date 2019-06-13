@@ -42,7 +42,7 @@ def helloworld():
     Returns "hello world" annd prints "returning 'hello world'" to the
         sys.stdout
     """
-    print "returning 'hello world'"
+    print("returning 'hello world'")
     return "hello world"
 
 def greaterThanTen(n):
@@ -72,17 +72,17 @@ locals = {}
 
 exec("a = 1" ,a.globals, locals)
 
-print "globals = {0}".format([g for g in a.globals if not g.startswith("__")])
-print "locals = {0}".format(locals)
+print("globals = {0}".format([g for g in a.globals if not g.startswith("__")]))
+print("locals = {0}".format(locals))
 
 exec("a += 1", a.globals, locals)
 
-print "globals = {0}".format([g for g in a.globals if not g.startswith("__")])
-print "locals = {0}".format(locals)
+print("globals = {0}".format([g for g in a.globals if not g.startswith("__")]))
+print("locals = {0}".format(locals))
 
 a.globals["b"] = 5
 
-print "globals = {0}".format([g for g in a.globals if not g.startswith("__")])
-print "locals = {0}".format(locals)
+print("globals = {0}".format([g for g in a.globals if not g.startswith("__")]))
+print("locals = {0}".format(locals))
 
 exec("global b;b += 1", a.globals, locals)

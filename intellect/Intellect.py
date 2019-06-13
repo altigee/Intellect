@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import logging
 import sys
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import os
 import errno
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from antlr3 import CommonTokenStream, ANTLRStringStream
 
@@ -146,7 +146,7 @@ class Intellect(object):
             # Cannot find file.
             raise IOError(errno.ENOENT, "Cannot find policy located at:  {0}".format(file_path))
 
-        full_path = urllib.pathname2url(os.path.abspath(file_path))
+        full_path = urllib.request.pathname2url(os.path.abspath(file_path))
         if file_path.startswith("file://"):
             return full_path
 
@@ -168,7 +168,7 @@ class Intellect(object):
             The text of the policy.
         '''
 
-        response = urllib2.urlopen(urlstring)
+        response = urllib.request.urlopen(urlstring)
         response.headers['content-type'] = 'text/plain; charset=utf8'
         content = response.read()
         return content
@@ -189,7 +189,7 @@ class Intellect(object):
             TypeError:  Raised when parameter 'identifier' is a NoneType.
         '''
         if identifier:
-            if isinstance(identifier, basestring):
+            if isinstance(identifier, str):
                 return self.learn_policy(identifier)
             elif self.knowledge.count(identifier) == 0:
                 self.knowledge.append(identifier)
@@ -223,7 +223,7 @@ class Intellect(object):
         is_file = False
 
         if identifier:
-            if isinstance(identifier, basestring):
+            if isinstance(identifier, str):
                 if urlparse(identifier).scheme:
 
                     # Treat 'identifier' as an URL
@@ -251,7 +251,7 @@ class Intellect(object):
                     except Exception as e:
                         if stderr.getvalue().rstrip() != "":
                             trace = sys.exc_info()[2]
-                            raise Exception(stderr.getvalue().rstrip()), None, trace
+                            raise Exception(stderr.getvalue().rstrip()).with_traceback(trace)
                         else:
                             raise e
 
@@ -270,7 +270,7 @@ class Intellect(object):
                     if "no viable alternative at input" in stderr.getvalue().rstrip():
                         raise Exception("Error parsing policy:  {0}\n{1}".format(identifier, stderr.getvalue().rstrip()))
                     else:
-                        print >> sys.stderr, stderr.getvalue().rstrip()
+                        print(stderr.getvalue().rstrip(), file=sys.stderr)
 
                 # set path attribute
                 file_node.path = identifier if is_file else None
@@ -337,7 +337,7 @@ class Intellect(object):
                         return
                 # neither fact nor policy so raise an exception
                 raise ValueError("Fact with id: {0} is not in knowledge".format(identifier))
-            elif isinstance(identifier, basestring):
+            elif isinstance(identifier, str):
                 # remove the policy policy file from knowledge
                 try:
                     for fileIndex, policy_file in enumerate(self.policy.files):
@@ -390,7 +390,7 @@ class Intellect(object):
                 object.
             Also, see forget-method 'raises'.
         '''
-        if isinstance(identifier, (basestring, File)):
+        if isinstance(identifier, (str, File)):
             self.forget(identifier)
         else:
             raise TypeError("Parameter 'identifier': {0} was neither a path to the policy to forget, or a Policy object.".format(identifier))

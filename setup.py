@@ -65,7 +65,7 @@ def fullsplit(path, result=None):
 init = os.path.join(os.path.dirname(__file__), 'intellect', '__init__.py')
 version_line = filter(lambda l: l.startswith('VERSION'), open(init))[0]
 VERSION = get_version(eval(version_line.split('=')[-1]))
-print VERSION
+print(VERSION)
 
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
@@ -105,4 +105,4 @@ setup(name="Intellect",
       packages=packages,
       package_data={'': ['*.g', '*.tokens', '*.policy']},
       include_package_data=True,
-      install_requires=['antlr_python_runtime>=3.1.3'])
+      install_requires=['antlr_python_runtime'])

@@ -243,7 +243,7 @@ def for_object_list(object, type):
         else:
             kind = DATA
 
-        print name, kind, obj
+        print(name, kind, obj)
 
         if (kind is type):
             value.append(name)

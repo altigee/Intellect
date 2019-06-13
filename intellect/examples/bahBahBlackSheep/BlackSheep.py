@@ -35,7 +35,7 @@ Created on Aug 18, 2011
 '''
 
 import logging, time
-import thread, random
+import _thread, random
 from threading import Lock
 
 from intellect.examples.bahBahBlackSheep.BagOfWool import BagOfWool
@@ -70,7 +70,7 @@ class BlackSheep():
         logging.getLogger("example").debug("Creating {0}.".format(self.name))
 
         self.lock = Lock()
-        thread.start_new_thread(grow_wool, (self,))
+        _thread.start_new_thread(grow_wool, (self,))
 
 
     @property
@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     while True:
         time.sleep(5)
-        print len(sheep.bags_of_wool)
+        print(len(sheep.bags_of_wool))
 
         if len(sheep.bags_of_wool) == 3:
             break

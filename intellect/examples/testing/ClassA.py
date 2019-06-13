@@ -56,7 +56,7 @@ class ClassA(object):
         self.property0 = property0
         self.property1 = property1
 
-        print "created an instance of ClassA"
+        print("created an instance of ClassA")
 
     @property
     def property0(self):

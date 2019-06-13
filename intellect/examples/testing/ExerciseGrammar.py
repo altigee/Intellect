@@ -61,9 +61,9 @@ if __name__ == "__main__":
     consoleHandler.setFormatter(logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s%(message)s'))
     logger.addHandler(consoleHandler)
 
-    print "*"*80
-    print """create an instance of MyIntellect extending Intellect, create some facts, and exercise the grammar"""
-    print "*"*80
+    print("*"*80)
+    print("""create an instance of MyIntellect extending Intellect, create some facts, and exercise the grammar""")
+    print("*"*80)
 
     try:
         myIntellect = Intellect()

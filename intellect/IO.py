@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
 import sys
-import StringIO
+import io
 
 
 class RedirectStdError(object):
 
     def __init__(self):
-        self._stderr = StringIO.StringIO()
+        self._stderr = io.StringIO()
 
     def __enter__(self):
         self.save_stderr = sys.stderr
@@ -60,7 +60,7 @@ class RedirectStdError(object):
 class RedirectStdOut(object):
 
     def __init__(self):
-        self._stdout = StringIO.StringIO()
+        self._stdout = io.StringIO()
 
     def __enter__(self):
         self.save_stdout = sys.stdout

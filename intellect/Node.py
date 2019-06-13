@@ -51,9 +51,9 @@ import uuid
 import sys
 
 import intellect.reflection as reflection
+import intellect.IO as IO
 
 from intellect.Callable import Callable
-import intellect.IO as IO
 
 
 class Node(object):
@@ -124,7 +124,7 @@ class Node(object):
         '''
         Sets the children list for this node.
         '''
-        if not isinstance(value, (list, types.NoneType)):
+        if not isinstance(value, (list, type(None))):
             raise TypeError("Parameter 'value' must be a List or NoneType.")
 
         if value is None:
@@ -154,7 +154,7 @@ class Node(object):
             raise TypeError("Parameter 'child' cannot be None.")
 
         # must be either a basestring or Node object
-        if not isinstance(child, (basestring, Node)):
+        if not isinstance(child, (str, Node)):
             raise TypeError("Parameter 'child' must be a basetring or Node.")
 
         # if children is not yet a list, make it a list object
@@ -182,7 +182,7 @@ class Node(object):
         # verify they are of the correct type, if not
         # raise a TypeError
         for child in children:
-            if not isinstance(child, (basestring, Node)):
+            if not isinstance(child, (str, Node)):
                 raise TypeError(str(child) + " must be a basetring or Node.")
 
         # if children is not yet a list, make it a list object
@@ -208,7 +208,7 @@ class Node(object):
             raise TypeError("Parameter 'child' cannot be None.")
 
         # must be either a basestring or Node object
-        if not isinstance(child, (basestring, Node)):
+        if not isinstance(child, (str, Node)):
             raise TypeError("Parameter 'child' must be a basetring or Node.")
 
         # if children is not yet a list, make it a list object
@@ -242,7 +242,7 @@ class Node(object):
         # verify they are of the correct type, if not
         # raise a TypeError
         for child in children:
-            if not isinstance(child, (basestring, Node)):
+            if not isinstance(child, (str, Node)):
                 raise TypeError(str(child) + " must be a basetring or Node.")
 
         # if children is not yet a list, make it a list object
@@ -277,7 +277,7 @@ class Node(object):
 
         # must be a int or None object otherwise
         # raise a TypeError
-        if isinstance(value, (int, types.NoneType)):
+        if isinstance(value, (int, type(None))):
             self._line = value
         else:
             raise TypeError("Must be an int or NoneType.")
@@ -310,7 +310,7 @@ class Node(object):
         seemed off.  So, I stripped the code out of the
         grammar setting this value.
         '''
-        if isinstance(value, (int, types.NoneType)):
+        if isinstance(value, (int, type(None))):
             self._column = value
         else:
             raise TypeError("Must be an int.")
@@ -392,7 +392,7 @@ class Node(object):
         Args:
             string: str to validate
         '''
-        if not isinstance(string, basestring):
+        if not isinstance(string, str):
             # Name tokens must be a str object.
             return False
         else:
@@ -605,7 +605,7 @@ class Policy(Node):
         # reset halt to false
         self.halt = False
 
-        if not isinstance(agenda, (list, types.NoneType)):
+        if not isinstance(agenda, (list, type(None))):
             raise TypeError("Parameter 'agenda' must be a List or NoneType.")
 
         if not agenda:
@@ -620,7 +620,7 @@ class Policy(Node):
                 exec(str(importStmt), self.globals)
             except ImportError as error:
                 exception_type, exception_value, exception_traceback = sys.exc_info()
-                raise ImportError(error.message + " at line: {0} from policy file: '{1}'".format(importStmt.line, importStmt.file.path), exception_type, exception_value), None, exception_traceback
+                raise ImportError(error.message + " at line: {0} from policy file: '{1}'".format(importStmt.line, importStmt.file.path), exception_type, exception_value).with_traceback(exception_traceback)
 
         # put the policy attributes into the policy's global namespace
         for attributeStmt in self.attributeStmts:
@@ -645,7 +645,7 @@ class Policy(Node):
 
                 while not self.halt:
                     try:
-                        ruleStmt = iterator.next()
+                        ruleStmt = next(iterator)
                     except StopIteration:
                         break
 
@@ -684,7 +684,7 @@ class File(Node):
         Sets the source file path this node is contained in.
         None if created from dynamically from string.
         '''
-        if isinstance(value, (basestring, types.NoneType)):
+        if isinstance(value, (str, type(None))):
             self._path = value
         else:
             raise TypeError("'path' must be of type string or None.")
@@ -725,7 +725,7 @@ class File(Node):
         file property to file_node.
         '''
 
-        if not isinstance(node, (Node, types.NoneType)):
+        if not isinstance(node, (Node, type(None))):
             raise TypeError("'node' must be of type Node.")
 
         node.file = file_node
@@ -770,8 +770,8 @@ class RuleStmt(Statement):
         when = self.filter_to_list(When, self)
         then = self.filter_to_list(Then, self)
 
-        print "when : {0}".format(when)
-        print "then : {0}".format(then)
+        print("when : {0}".format(when))
+        print("then : {0}".format(then))
 
         value = "rule {0}:\n".format(self.children[1])
 
@@ -916,7 +916,7 @@ class When(Node):
 
     @ruleCondition.setter
     def ruleCondition(self, value):
-        raise NotImplementedError, "ruleCondition property cannot be set."
+        raise NotImplementedError("ruleCondition property cannot be set.")
 
 
     def eval(self, policy, ruleStmt):
@@ -952,12 +952,12 @@ class When(Node):
             if classConstraint.constraint:
 
                 # create 'localScope' dict and add 'policy' and 'klazz' to it
-                localScope = {}
-                localScope["policy"] = policy
-                localScope["klazz"] = klazz
+                # localScope = {}
+                policy.globals["policy"] = policy
+                policy.globals["klazz"] = klazz
 
                 # This is needed because for the reasons documented in reflection.is_instance
-                localScope["reflection"] = reflection.module_from_str("intellect.reflection")
+                policy.globals["reflection"] = reflection.module_from_str("intellect.reflection")
 
                 # Rewrite the ClassConstraint.constraint
                 rewrittenConstraint = When.rewrite(classConstraint.constraint, Constraint(), klazz)
@@ -982,15 +982,17 @@ class When(Node):
                 try:
                     # Execute the dynamically built list comprehension code
 
-                    self.log("policy.globals.keys = {0}".format(policy.globals.keys()))
-                    self.log("localScope = {0}".format(localScope.keys()))
-                    exec(code, policy.globals, localScope)
+                    self.log("policy.globals.keys = {0}".format(list(policy.globals.keys())))
+                    # self.log("localScope = {0}".format(localScope))
 
-                    matches = localScope["matches"]
+                    self.log(f"code = {code}")
+                    exec(code, policy.globals)
+
+                    matches = policy.globals["matches"]
 
                 except Exception as error:
                     exception_type, exception_value, exception_traceback = sys.exc_info()
-                    raise SyntaxError, ("{0} in rule: '{1}', near line: {2} in policy file: '{3}'".format(error, ruleStmt.id, self.line, self.file.path), exception_type, exception_value), exception_traceback
+                    raise SyntaxError("{0} in rule: '{1}', near line: {2} in policy file: '{3}'".format(error, ruleStmt.id, self.line, self.file.path), exception_type, exception_value).with_traceback(exception_traceback)
 
                 self.log("The matches found in memory: {0}".format(matches))
             else:
@@ -1169,7 +1171,7 @@ class Then(Node):
                             exec(str(code), policy.globals, localScope)
                         except Exception as error:
                             exception_type, exception_value, exception_traceback = sys.exc_info()
-                            raise SyntaxError ("{0} in rule: '{1}' at line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, actualAction.line, self.file.path), exception_type, exception_value), None, exception_traceback
+                            raise SyntaxError ("{0} in rule: '{1}' at line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, actualAction.line, self.file.path), exception_type, exception_value).with_traceback(exception_traceback)
 
                         policy.intellect.learn(localScope["new_fact"])
 
@@ -1190,7 +1192,7 @@ class Then(Node):
                                         exec("value" + " = " + str(Then.rewrite(propertyAssignment.constraint, Constraint(), objectBinding)), policy.globals, localScope)
                                     except Exception as error:
                                         exception_type, exception_value, exception_traceback = sys.exc_info()
-                                        raise SyntaxError("{0} in rule: '{1}' near line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, actualAction.line, self.file.path), exception_type, exception_value), None, exception_traceback
+                                        raise SyntaxError("{0} in rule: '{1}' near line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, actualAction.line, self.file.path), exception_type, exception_value).with_traceback(exception_traceback)
 
                                     self.log("modifying {0} property {1} with value of {2} with assignment of {3}".format(objectBinding, propertyAssignment, localScope["value"], propertyAssignment.assignment))
 
@@ -1274,7 +1276,7 @@ class Then(Node):
                         exec(str(code), policy.globals, localScope)
                     except Exception as error:
                         exception_value, exception_traceback = sys.exc_info()
-                        raise SyntaxError("{0} in rule: '{1}' at line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, actualAction.line, self.file.path), exception_type, exception_value), None, exception_traceback
+                        raise SyntaxError("{0} in rule: '{1}' at line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, actualAction.line, self.file.path), exception_type, exception_value).with_traceback(exception_traceback)
 
                     policy.intellect.learn(localScope["new_fact"])
 
@@ -1326,11 +1328,11 @@ class Then(Node):
             with IO.RedirectStdOut() as stdout:
                 exec(str(code), policy.globals, localScope)
 
-            print stdout.getvalue()
+            print(stdout.getvalue())
 
-        except Exception, error:
+        except Exception as error:
             exception_type, exception_value, exception_traceback = sys.exc_info()
-            raise RuntimeError("{0} in rule: '{1}' near line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, self.line, self.file.path), exception_type, exception_value), None, exception_traceback
+            raise RuntimeError("{0} in rule: '{1}' near line: {2} in the policy file: '{3}'".format(error, ruleStmt.id, self.line, self.file.path), exception_type, exception_value).with_traceback(exception_traceback)
 
 
     @staticmethod
@@ -1468,7 +1470,7 @@ class ClassConstraint(Node):
         '''
         Return an objectBinding str, if one exists otherwise None
         '''
-        if isinstance(self.first_child(), basestring) and self.first_child().startswith("$"):
+        if isinstance(self.first_child(), str) and self.first_child().startswith("$"):
             return self.first_child()
         else:
             return None

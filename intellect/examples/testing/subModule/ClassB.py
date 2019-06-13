@@ -59,7 +59,7 @@ class ClassB(ClassA):
         self.property2 = property2
         self.modified = False
 
-        print "created an instance of ClassB"
+        print("created an instance of ClassB")
 
     @property
     def property2(self):
@@ -67,7 +67,7 @@ class ClassB(ClassA):
 
     @property2.setter
     def property2(self, value):
-        print "setting property2 to {0}".format(value)
+        print("setting property2 to {0}".format(value))
         self._property2 = value
 
     @property
@@ -76,7 +76,7 @@ class ClassB(ClassA):
 
     @modified.setter
     def modified(self, value):
-        print "setting modified to {0}".format(value)
+        print("setting modified to {0}".format(value))
         self._modified = value
 
     def aMethod(self):
