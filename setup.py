@@ -63,7 +63,7 @@ def fullsplit(path, result=None):
     return fullsplit(head, [tail] + result)
 
 init = os.path.join(os.path.dirname(__file__), 'intellect', '__init__.py')
-version_line = filter(lambda l: l.startswith('VERSION'), open(init))[0]
+version_line = list(filter(lambda l: l.startswith('VERSION'), open(init)))[0]
 VERSION = get_version(eval(version_line.split('=')[-1]))
 print(VERSION)
 
